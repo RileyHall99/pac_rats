@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">pacRat_good_empty</string>
+    <string name="title">Title</string>
+    <string name="date">Date of Release</string>
+    <string name="purchase">Date of Purchase</string>
+    <string name="desc">Description</string>
+    <string name="upload">Upload</string>
+</resources>
