@@ -15,8 +15,8 @@ public class CollectionDatabase extends SQLiteOpenHelper {
     private static CollectionDatabase database;
     public static final String TABLE_NAME = "collectionDetails";
     public static final String NAME = "NAME";
-    public static final String RELEASED = "Date Released";
-    public static final String PURCHASED = "Date Purchased";
+    public static final String RELEASED = "Date_Released";
+    public static final String PURCHASED = "Date_Purchased";
     public static final String PHOTO = "PHOTO";
     private static final String ID = "ID";
     private static final String DESCRIPTION = "DESCRIPTION";
@@ -43,25 +43,34 @@ public class CollectionDatabase extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         StringBuilder sql;
-        sql = new StringBuilder().append("CREATE TABLE")
+//        sql = new StringBuilder().append("CREATE TABLE")
+//
+//                .append(TABLE_NAME)
+//                .append("(")
+//                .append(ID)
+//                .append(" INTEGER PRIMARY KEY AUTOINCREMENT , ")
+//                .append(counter)
+//                .append(" INT , ")
+//                .append(NAME)
+//                .append(" Text , ")
+//                .append(RELEASED)
+//                .append(" Date , ")
+//                .append(PURCHASED)
+//                .append(" Date , ")
+//                .append(DESCRIPTION)
+//                .append(" TEXT , ")
+//                .append(PHOTO)
+//                .append("BLOB)");
+//        db.execSQL(sql.toString());
+        String query = "CREATE TABLE " + TABLE_NAME + " ("
+                + ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + NAME + " TEXT, "
+                + PURCHASED + " DATE, "
+                + RELEASED + " TEXT, "
+                + PHOTO + " BLOB,"
+                + DESCRIPTION + " TEXT)";
+        db.execSQL(query);
 
-                .append(TABLE_NAME)
-                .append("(")
-                .append(ID)
-                .append(" INTEGER PRIMARY KEY AUTOINCREMENT , ")
-                .append(counter)
-                .append(" INT , ")
-                .append(NAME)
-                .append(" Text , ")
-                .append(RELEASED)
-                .append(" Date , ")
-                .append(PURCHASED)
-                .append(" Date , ")
-                .append(DESCRIPTION)
-                .append(" TEXT , ")
-                .append(PHOTO)
-                .append("BLOB)");
-        db.execSQL(sql.toString());
     }
 
     public void addNewItem(String name ,String released , String purchased , String description , String map ){

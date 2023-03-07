@@ -28,7 +28,7 @@ public class upload_new_item extends AppCompatActivity {
     private int CAMERA_REQUEST = 1001;
     private TextRecognizer recognize ;
     private Bitmap image;
-    private CollectionDatabase database;
+    private CollectionDatabase collectionDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,24 +54,40 @@ public class upload_new_item extends AppCompatActivity {
         binding.button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String name = binding.name.toString();
-                String release = binding.date.toString();
-                String purchased = binding.purchase.toString();
-                String desc = binding.description.toString();
-                String img = image.toString();
-                if(name.isEmpty() && release.isEmpty() && purchased.isEmpty() && desc.isEmpty() && img.isEmpty()){
+                collectionDatabase = new CollectionDatabase(getApplicationContext());
+                String name = "";
+                String release = "";
+                String purchased = "";
+                String desc = "";
+                String img = "";
+                name = binding.name.getText().toString();
+                release = binding.date.getText().toString();
+                purchased = binding.purchase.getText().toString();
+                desc = binding.description.getText().toString();
+
+                img = image.toString();
+
+                try {
+                    //String name ,String released , String purchased , String description , String map
+                    Log.d("hello", "onClick: NAME" + name + "\nRELEASE" + release + "\nPURCHASED" + purchased + "\nDESC" + desc + "\nIMAGE" + img );
+                    collectionDatabase.addNewItem(name, release, purchased, desc, img);
+                    Toast.makeText(getApplicationContext(), "Course has been added.", Toast.LENGTH_SHORT).show();
+                }
+                catch (Exception e) {
+
                     Toast.makeText(getApplicationContext(), "Please enter all the data..", Toast.LENGTH_SHORT).show();
+                    Log.d("hello", "onClick: ERROR " + e);
                     return;
                 }
 
-                database.addNewItem(name, release,purchased,desc,img);
-                Toast.makeText(getApplicationContext(), "Course has been added.", Toast.LENGTH_SHORT).show();
 
-                binding.name.setText("");
-                binding.date.setText("");
-                binding.purchase.setText("");
-                binding.description.setText("");
-                binding.imageView2.setImageBitmap(null);
+
+
+//                binding.name.setText("");
+//                binding.date.setText("");
+//                binding.purchase.setText("");
+//                binding.description.setText("");
+//                binding.imageView2.setImageBitmap(null);
             }
         });
 
