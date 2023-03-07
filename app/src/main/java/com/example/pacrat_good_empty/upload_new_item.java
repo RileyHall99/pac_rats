@@ -83,11 +83,13 @@ public class upload_new_item extends AppCompatActivity {
 
 
 
-//                binding.name.setText("");
-//                binding.date.setText("");
-//                binding.purchase.setText("");
-//                binding.description.setText("");
-//                binding.imageView2.setImageBitmap(null);
+                binding.name.setText("");
+                binding.date.setText("");
+                binding.purchase.setText("");
+                binding.description.setText("");
+                binding.imageView2.setImageBitmap(null);
+                Intent back_toMain = new Intent(view.getContext() , MainActivity.class);
+                startActivity(back_toMain);
             }
         });
 

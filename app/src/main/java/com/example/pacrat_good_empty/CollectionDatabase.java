@@ -2,12 +2,16 @@ package com.example.pacrat_good_empty;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Hashtable;
 
 public class CollectionDatabase extends SQLiteOpenHelper {
     public static final int Database_Version = 1;
@@ -87,6 +91,28 @@ public class CollectionDatabase extends SQLiteOpenHelper {
 
         db.close();
 
+    }
+
+    public ArrayList<Dictionary> readFromDB(){
+        ArrayList <Dictionary> list = new ArrayList<Dictionary>();
+        Dictionary <String , String> dict = new Hashtable<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("Select * FROM " + TABLE_NAME , null);
+
+        if(cursor.moveToFirst()) {
+            do{
+                dict.remove(dict.keys());
+                dict.put("Name" , cursor.getString(1));
+                dict.put("Purchased" , cursor.getString(2));
+                dict.put("Released" , cursor.getString(3));
+                dict.put("Desc" , cursor.getString(4));
+                dict.put("photo" , cursor.getString(5));
+                list.add(dict);
+            }while (cursor.moveToNext());
+        }
+
+        return list;
     }
 
     @Override
