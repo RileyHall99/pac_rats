@@ -19,8 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="47dp"
         android:layout_weight="0.15"
-        android:hint="@string/title"
-        />
+        android:hint="@string/title" />
 
     <EditText
         android:id="@+id/date"

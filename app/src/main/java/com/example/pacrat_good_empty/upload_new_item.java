@@ -27,6 +27,9 @@ public class upload_new_item extends AppCompatActivity {
     private ActivityUploadNewItemBinding binding;
     private int CAMERA_REQUEST = 1001;
     private TextRecognizer recognize ;
+    private Bitmap image;
+    private CollectionDatabase database;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,7 +54,24 @@ public class upload_new_item extends AppCompatActivity {
         binding.button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String name = binding.name.toString();
+                String release = binding.date.toString();
+                String purchased = binding.purchase.toString();
+                String desc = binding.description.toString();
+                String img = image.toString();
+                if(name.isEmpty() && release.isEmpty() && purchased.isEmpty() && desc.isEmpty() && img.isEmpty()){
+                    Toast.makeText(getApplicationContext(), "Please enter all the data..", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
+                database.addNewItem(name, release,purchased,desc,img);
+                Toast.makeText(getApplicationContext(), "Course has been added.", Toast.LENGTH_SHORT).show();
+
+                binding.name.setText("");
+                binding.date.setText("");
+                binding.purchase.setText("");
+                binding.description.setText("");
+                binding.imageView2.setImageBitmap(null);
             }
         });
 
@@ -63,6 +83,7 @@ public class upload_new_item extends AppCompatActivity {
         if (requestCode == CAMERA_REQUEST) {
             Bitmap image = (Bitmap) data.getExtras().get("data");
             Log.d("hello", "onActivityResult: INSIDE PERMISSIONS");
+            this.image = image;
             getData(image);
         }
 
