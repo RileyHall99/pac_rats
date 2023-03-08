@@ -6,12 +6,15 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.example.pacrat_good_empty.databinding.ActivityUploadNewItemBinding;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -23,7 +26,11 @@ import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 
+import java.io.File;
+import java.io.FileOutputStream;
+
 public class upload_new_item extends AppCompatActivity {
+    private static final int MY_PERMISSIONS_WRITE_EXTERNAL_STORAGE = 100010;
     private ActivityUploadNewItemBinding binding;
     private int CAMERA_REQUEST = 1001;
     private TextRecognizer recognize ;
@@ -43,6 +50,38 @@ public class upload_new_item extends AppCompatActivity {
                 requestPermissions(new String[]{Manifest.permission.CAMERA}, CAMERA_REQUEST);
             }
         }
+
+
+        //READING AND WRITING PERMISIONS
+
+        // Here, thisActivity is the current activity
+        if (ContextCompat.checkSelfPermission(upload_new_item.this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Permission is not granted
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(upload_new_item.this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+            } else {
+                // No explanation needed; request the permission
+                ActivityCompat.requestPermissions(upload_new_item.this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        MY_PERMISSIONS_WRITE_EXTERNAL_STORAGE);
+
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+        } else {
+            // Permission has already been granted
+        }
+
+
+
 
         binding.imageView2.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,18 +104,29 @@ public class upload_new_item extends AppCompatActivity {
                 purchased = binding.purchase.getText().toString();
                 desc = binding.description.getText().toString();
 
-                img = image.toString();
+
 
                 try {
                     //String name ,String released , String purchased , String description , String map
-                    Log.d("hello", "onClick: NAME" + name + "\nRELEASE" + release + "\nPURCHASED" + purchased + "\nDESC" + desc + "\nIMAGE" + img );
-                    collectionDatabase.addNewItem(name, release, purchased, desc, img);
+                    Log.d("hello", "onClick: NAME" + name + "\nRELEASE" + release + "\nPURCHASED" + purchased + "\nDESC" + desc + "\nIMAGE" + image );
+                    //writing file to sdcard
+                    String external = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString();
+                    File file = new File(external,  name+".png");
+
+                    FileOutputStream outputStream = new FileOutputStream(file);
+                    image.compress(Bitmap.CompressFormat.PNG,100,outputStream);
+
+                    outputStream.flush();
+
+                    outputStream.close();
+
+                    collectionDatabase.addNewItem(name, release, purchased, desc, image);
                     Toast.makeText(getApplicationContext(), "Course has been added.", Toast.LENGTH_SHORT).show();
                 }
                 catch (Exception e) {
 
                     Toast.makeText(getApplicationContext(), "Please enter all the data..", Toast.LENGTH_SHORT).show();
-                    Log.d("hello", "onClick: ERROR " + e);
+                    Log.d("hello", "onClick: ERROR " + e.getMessage());
                     return;
                 }
 

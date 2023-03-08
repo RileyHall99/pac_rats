@@ -6,16 +6,18 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Environment;
+import android.util.Log;
 
+import java.io.ByteArrayOutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.Hashtable;
 
 public class CollectionDatabase extends SQLiteOpenHelper {
     public static final int Database_Version = 1;
-    public static final String DATABASE_NAME = "collectionDatabase.db";
+    public static final String DATABASE_NAME = "collectionDatabase";
     private static CollectionDatabase database;
     public static final String TABLE_NAME = "collectionDetails";
     public static final String NAME = "NAME";
@@ -41,76 +43,94 @@ public class CollectionDatabase extends SQLiteOpenHelper {
             database = new CollectionDatabase(context);
 
         }
+
         return database;
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         StringBuilder sql;
-//        sql = new StringBuilder().append("CREATE TABLE")
-//
-//                .append(TABLE_NAME)
-//                .append("(")
-//                .append(ID)
-//                .append(" INTEGER PRIMARY KEY AUTOINCREMENT , ")
-//                .append(counter)
-//                .append(" INT , ")
-//                .append(NAME)
-//                .append(" Text , ")
-//                .append(RELEASED)
-//                .append(" Date , ")
-//                .append(PURCHASED)
-//                .append(" Date , ")
-//                .append(DESCRIPTION)
-//                .append(" TEXT , ")
-//                .append(PHOTO)
-//                .append("BLOB)");
-//        db.execSQL(sql.toString());
-        String query = "CREATE TABLE " + TABLE_NAME + " ("
-                + ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + NAME + " TEXT, "
-                + PURCHASED + " DATE, "
-                + RELEASED + " TEXT, "
-                + PHOTO + " BLOB,"
-                + DESCRIPTION + " TEXT)";
-        db.execSQL(query);
+        if(database ==null) {
+            String query = "CREATE TABLE " + TABLE_NAME + " ( "
+                    + ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                    + NAME + " TEXT , "
+                    + PURCHASED + " DATE, "
+                    + RELEASED + " DATE, "
+                    + PHOTO + " BLOB,"
+                    + DESCRIPTION + " TEXT)";
+            db.execSQL(query);
+        }
+
 
     }
 
-    public void addNewItem(String name ,String released , String purchased , String description , String map ){
+    public void addNewItem(String name ,String released , String purchased , String description , Bitmap map ){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues val = new ContentValues();
 
+        Bitmap bmp = map;
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
+
+        bmp.recycle();
+
+//        String sql = "INSERT INTO " + TABLE_NAME + " ( "+NAME+ " , "+PURCHASED+" , "+RELEASED+" , "+DESCRIPTION+" )"+
+//                " VALUES ( "+ name+" , " + purchased +" , "+ released +" , " + description+ " )";
         val.put(NAME ,  name);
         val.put(PURCHASED , purchased);
         val.put(RELEASED,released);
         val.put(DESCRIPTION,description);
-        val.put(PHOTO , map);
+
 
         db.insert(TABLE_NAME,null,val);
 
         db.close();
 
+//        db.execSQL(sql);
+
+//        String sql =
+//                "INSERT or replace INTO " + TABLE_NAME + " ( "+NAME + " , " + RELEASED +" , "+ PURCHASED +" , "+ DESCRIPTION+" ) "+ " VALUES ( "+ name +" , " + released +
+//                " , " + purchased + " , " + description + " )";
+//        db.execSQL(sql);
+
     }
 
-    public ArrayList<Dictionary> readFromDB(){
-        ArrayList <Dictionary> list = new ArrayList<Dictionary>();
-        Dictionary <String , String> dict = new Hashtable<>();
+    public ArrayList<individual_collection_items> readFromDB(){
+        ArrayList <individual_collection_items> list = new ArrayList<individual_collection_items>();
+
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = db.rawQuery("Select * FROM " + TABLE_NAME , null);
 
+        Cursor count = db.rawQuery("Select count(*) from " + TABLE_NAME,null);
+
+        Log.d("hello", "readFromDB: COUNT OF ROWS  " + count.getCount());
+
+
+
         if(cursor.moveToFirst()) {
             do{
-                dict.remove(dict.keys());
-                dict.put("Name" , cursor.getString(1));
-                dict.put("Purchased" , cursor.getString(2));
-                dict.put("Released" , cursor.getString(3));
-                dict.put("Desc" , cursor.getString(4));
-                dict.put("photo" , cursor.getString(5));
-                list.add(dict);
+                String external  = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString()+"/" +cursor.getString(cursor.getColumnIndexOrThrow(NAME))+".png";
+                Bitmap bm = BitmapFactory.decodeFile(external);
+
+                individual_collection_items items = new individual_collection_items(cursor.getString(cursor.getColumnIndexOrThrow(NAME)) , cursor.getString(cursor.getColumnIndexOrThrow(RELEASED)) ,
+                        cursor.getString(cursor.getColumnIndexOrThrow(PURCHASED)) ,bm ,cursor.getString(cursor.getColumnIndexOrThrow(DESCRIPTION))  );
+//                dict.remove(dict.keys());
+//                dict.put("Name" , );
+//                dict.put("Purchased" , );
+//                dict.put("Released" , );
+//                dict.put("Desc" , );
+//                byte [] byt = cursor.getBlob(cursor.getColumnIndexOrThrow(PHOTO));
+//                Bitmap bitmap= BitmapFactory.decodeByteArray(byt , 0 , byt.length);
+//                Log.d("hell", "readFromDB: .dfadfa   " + cursor.getBlob(cursor.getColumnIndexOrThrow(PHOTO)));
+//                Log.d("hell", "readFromDB: .dfadfa  nulll  " + bitmap);
+//                dict.put("photo" , bitmap);
+                list.add(items);
+
             }while (cursor.moveToNext());
         }
+
 
         return list;
     }
