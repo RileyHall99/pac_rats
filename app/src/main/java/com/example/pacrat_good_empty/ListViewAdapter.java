@@ -66,6 +66,7 @@ public class ListViewAdapter extends ArrayAdapter<individual_collection_items> {
             // then according to the position of the view assign the desired TextView 1 for the same
             if(textView1!=null) {
                 textView1.setText( "RELEASE DATE: "+ item.item_released);
+                Log.d("list_view", "getView: ++++++++ " + item.item_released );
             }
 
             // then according to the position of the view assign the desired TextView 2 for the same

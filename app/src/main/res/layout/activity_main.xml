@@ -7,17 +7,46 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragmentContainer"
+        android:name="com.example.pacrat_good_empty.fragment_add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:visibility="gone" />
+    <Spinner
+        android:id="@+id/tableNameSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+<!--        android:layout_weight="0.25" />-->
+
     <ListView
         android:id="@+id/feed"
         android:layout_width="match_parent"
-        android:layout_height="669dp"
-        android:layout_weight="0.7" />
+        android:layout_height="803dp"
+        android:layout_weight="0.7">
 
-    <Button
-        android:id="@+id/ocr_start"
-        android:layout_width="429dp"
+    </ListView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0.1"
-        android:text="Post" />
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/create_collection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:gravity="top"
+            android:text="@string/newdb" />
+
+        <Button
+            android:id="@+id/ocr_start"
+            android:layout_width="429dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:text="@string/newfile" />
+    </LinearLayout>
 
 </LinearLayout>

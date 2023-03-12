@@ -14,13 +14,21 @@
         android:layout_weight="0.25"
         tools:srcCompat="@tools:sample/avatars" />
 
+    <Spinner
+        android:id="@+id/tableNameSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.25" />
+
+
     <EditText
         android:id="@+id/name"
         android:layout_width="match_parent"
         android:layout_height="47dp"
         android:layout_weight="0.15"
         android:autoText="true"
-        android:hint="@string/title" />
+        android:hint="@string/title"
+        />
 
     <EditText
         android:id="@+id/date"
@@ -28,6 +36,7 @@
         android:layout_height="52dp"
         android:layout_weight="0.15"
         android:hint="@string/date"
+        android:inputType="date"
          />
 
     <EditText
@@ -36,6 +45,7 @@
         android:layout_height="41dp"
         android:layout_weight="0.15"
         android:hint="@string/purchase"
+        android:inputType="date"
          />
 
     <EditText

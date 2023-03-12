@@ -19,7 +19,7 @@ public class CollectionDatabase extends SQLiteOpenHelper {
     public static final int Database_Version = 1;
     public static final String DATABASE_NAME = "collectionDatabase";
     private static CollectionDatabase database;
-    public static final String TABLE_NAME = "collectionDetails";
+    public static String TABLE_NAME = "collection_1";
     public static final String NAME = "NAME";
     public static final String RELEASED = "Date_Released";
     public static final String PURCHASED = "Date_Purchased";
@@ -29,11 +29,13 @@ public class CollectionDatabase extends SQLiteOpenHelper {
     private static int counter = 0;
     private static Bitmap map;
 
+
     private static final DateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy");
 
-    public CollectionDatabase(Context context) {
+    public CollectionDatabase(Context context ) {
 
         super(context, DATABASE_NAME, null, Database_Version);
+
 
 
     }
@@ -50,7 +52,7 @@ public class CollectionDatabase extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         StringBuilder sql;
-        if(database ==null) {
+        if(database ==null && TABLE_NAME!="") {
             String query = "CREATE TABLE " + TABLE_NAME + " ( "
                     + ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                     + NAME + " TEXT , "
@@ -59,10 +61,57 @@ public class CollectionDatabase extends SQLiteOpenHelper {
                     + PHOTO + " BLOB,"
                     + DESCRIPTION + " TEXT)";
             db.execSQL(query);
+            Log.d("query2", "onCreate: " + query);
         }
 
 
+
+
     }
+
+    public void createTable(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "CREATE TABLE " + TABLE_NAME + " ( "
+                + ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + NAME + " TEXT , "
+                + PURCHASED + " DATE, "
+                + RELEASED + " DATE, "
+                + PHOTO + " BLOB,"
+                + DESCRIPTION + " TEXT)";
+        db.execSQL(query);
+        Log.d("query2", "onCreate: createTable " + query);
+
+        Log.d("hello", "createTable:  " + query);
+
+
+    }
+
+    public String [] getTableNames(){
+        SQLiteDatabase db = this.getReadableDatabase();
+        ArrayList<String> list = new ArrayList<String>();
+
+//
+//        String query = "SELECT * FROM " + DATABASE_NAME + " Where type = 'table'";
+//
+//        db.execSQL(query);
+
+        Cursor c = db.rawQuery("SELECT name FROM sqlite_master WHERE type='table' AND name!='android_metadata' AND name!='sqlite_sequence' order by name", null);
+
+        if (c.moveToFirst()) {
+            while ( !c.isAfterLast() ) {
+                list.add(c.getString(c.getColumnIndexOrThrow("name")));
+                c.moveToNext();
+            }
+        }
+        String [] arr = new String[list.size()];
+
+        for(int i = 0 ; i<list.size() ; i++) {
+            arr[i] = list.get(i);
+        }
+        return  arr;
+
+    }
+
 
     public void addNewItem(String name ,String released , String purchased , String description , Bitmap map ){
         SQLiteDatabase db = this.getWritableDatabase();
@@ -82,6 +131,7 @@ public class CollectionDatabase extends SQLiteOpenHelper {
         val.put(RELEASED,released);
         val.put(DESCRIPTION,description);
 
+//        Log.d("query2", "addNewItem: INSERT STATMENT   " + db.insert(TABLE_NAME,null,val));
 
         db.insert(TABLE_NAME,null,val);
 
@@ -100,6 +150,7 @@ public class CollectionDatabase extends SQLiteOpenHelper {
         ArrayList <individual_collection_items> list = new ArrayList<individual_collection_items>();
 
         SQLiteDatabase db = this.getReadableDatabase();
+        Log.d("query2", "readFromDB: " + TABLE_NAME);
 
         Cursor cursor = db.rawQuery("Select * FROM " + TABLE_NAME , null);
 
@@ -124,7 +175,7 @@ public class CollectionDatabase extends SQLiteOpenHelper {
 //                byte [] byt = cursor.getBlob(cursor.getColumnIndexOrThrow(PHOTO));
 //                Bitmap bitmap= BitmapFactory.decodeByteArray(byt , 0 , byt.length);
 //                Log.d("hell", "readFromDB: .dfadfa   " + cursor.getBlob(cursor.getColumnIndexOrThrow(PHOTO)));
-//                Log.d("hell", "readFromDB: .dfadfa  nulll  " + bitmap);
+                Log.d("query2", "readFromDB: .dfadfa  nulll  " +cursor.getString(cursor.getColumnIndexOrThrow(PURCHASED)));
 //                dict.put("photo" , bitmap);
                 list.add(items);
 
@@ -134,6 +185,8 @@ public class CollectionDatabase extends SQLiteOpenHelper {
 
         return list;
     }
+
+
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {

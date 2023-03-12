@@ -5,4 +5,10 @@
     <string name="purchase">Date of Purchase</string>
     <string name="desc">Description</string>
     <string name="upload">Upload</string>
+    <string name="newfile">Upload new File</string>
+    <string name="newdb">New Collection Database</string>
+    <string name="add_db">Add New Database</string>
+    <string name="db_name">Database Name</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

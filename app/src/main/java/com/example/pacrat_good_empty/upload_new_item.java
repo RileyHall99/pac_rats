@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -36,6 +38,7 @@ public class upload_new_item extends AppCompatActivity {
     private TextRecognizer recognize ;
     private Bitmap image;
     private CollectionDatabase collectionDatabase;
+    private String TABLENAME = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +53,7 @@ public class upload_new_item extends AppCompatActivity {
                 requestPermissions(new String[]{Manifest.permission.CAMERA}, CAMERA_REQUEST);
             }
         }
+
 
 
         //READING AND WRITING PERMISIONS
@@ -81,6 +85,30 @@ public class upload_new_item extends AppCompatActivity {
         }
 
 
+        //SPINNER
+        collectionDatabase = new CollectionDatabase(this);
+        String [] arr = collectionDatabase.getTableNames();
+
+        Log.d("hello", "onCreate: " + arr[0]);
+
+
+        ArrayAdapter adapt = new ArrayAdapter(this, android.R.layout.simple_list_item_1,arr);
+        adapt.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+        binding.tableNameSpinner.setAdapter(adapt);
+
+        binding.tableNameSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                TABLENAME = arr[i];
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                TABLENAME = "";
+            }
+        });
+
+
 
 
         binding.imageView2.setOnClickListener(new View.OnClickListener() {
@@ -93,55 +121,56 @@ public class upload_new_item extends AppCompatActivity {
         binding.button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                collectionDatabase = new CollectionDatabase(getApplicationContext());
-                String name = "";
-                String release = "";
-                String purchased = "";
-                String desc = "";
-                String img = "";
-                name = binding.name.getText().toString();
-                release = binding.date.getText().toString();
-                purchased = binding.purchase.getText().toString();
-                desc = binding.description.getText().toString();
+                if (TABLENAME.equals("")) {
+                    Toast.makeText(getApplicationContext(), "PLEASE SELECT TABLE", Toast.LENGTH_LONG).show();
+                } else {
+                    collectionDatabase = new CollectionDatabase(getApplicationContext());
+                    String name = "";
+                    String release = "";
+                    String purchased = "";
+                    String desc = "";
+                    String img = "";
+                    name = binding.name.getText().toString();
+                    release = binding.date.getText().toString();
+                    purchased = binding.purchase.getText().toString();
+                    desc = binding.description.getText().toString();
 
 
+                    try {
+                        //String name ,String released , String purchased , String description , String map
+                        Log.d("hello", "onClick: NAME" + name + "\nRELEASE" + release + "\nPURCHASED" + purchased + "\nDESC" + desc + "\nIMAGE" + image);
+                        //writing file to sdcard
+                        String external = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString();
+                        File file = new File(external, name + ".png");
 
-                try {
-                    //String name ,String released , String purchased , String description , String map
-                    Log.d("hello", "onClick: NAME" + name + "\nRELEASE" + release + "\nPURCHASED" + purchased + "\nDESC" + desc + "\nIMAGE" + image );
-                    //writing file to sdcard
-                    String external = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString();
-                    File file = new File(external,  name+".png");
+                        FileOutputStream outputStream = new FileOutputStream(file);
+                        image.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
 
-                    FileOutputStream outputStream = new FileOutputStream(file);
-                    image.compress(Bitmap.CompressFormat.PNG,100,outputStream);
+                        outputStream.flush();
 
-                    outputStream.flush();
+                        outputStream.close();
+                        collectionDatabase.TABLE_NAME = TABLENAME;
+                        collectionDatabase.addNewItem(name, release, purchased, desc, image);
+                        Toast.makeText(getApplicationContext(), "Course has been added.", Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) {
 
-                    outputStream.close();
+                        Toast.makeText(getApplicationContext(), "Please enter all the data..", Toast.LENGTH_SHORT).show();
+                        Log.d("hello", "onClick: ERROR " + e.getMessage());
+                        return;
+                    }
 
-                    collectionDatabase.addNewItem(name, release, purchased, desc, image);
-                    Toast.makeText(getApplicationContext(), "Course has been added.", Toast.LENGTH_SHORT).show();
+
+                    binding.name.setText("");
+                    binding.date.setText("");
+                    binding.purchase.setText("");
+                    binding.description.setText("");
+                    binding.imageView2.setImageBitmap(null);
+                    Intent back_toMain = new Intent(view.getContext(), MainActivity.class);
+                    startActivity(back_toMain);
                 }
-                catch (Exception e) {
-
-                    Toast.makeText(getApplicationContext(), "Please enter all the data..", Toast.LENGTH_SHORT).show();
-                    Log.d("hello", "onClick: ERROR " + e.getMessage());
-                    return;
-                }
-
-
-
-
-                binding.name.setText("");
-                binding.date.setText("");
-                binding.purchase.setText("");
-                binding.description.setText("");
-                binding.imageView2.setImageBitmap(null);
-                Intent back_toMain = new Intent(view.getContext() , MainActivity.class);
-                startActivity(back_toMain);
             }
         });
+
 
     }
 
